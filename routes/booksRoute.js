@@ -23,6 +23,7 @@ router.post('/', async (request, response) => {
       location: request.body.location,
       phone: request.body.phone,
       rating: request.body.rating,
+      rating: request.body.amountOfRatings,
     };
 
     const book = await Book.create(newBook);
