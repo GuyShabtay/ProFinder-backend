@@ -37,7 +37,15 @@ router.post('/', async (request, response) => {
 // Route for Get All Books from database
 router.get('/', async (request, response) => {
   try {
-    const books = await Book.find({});
+    const { q, option } = request.query;
+
+    let query = {};
+
+    if (q && option) {
+      query[option] = { $regex: q, $options: 'i' };
+    }
+
+    const books = await Book.find(query);
 
     return response.status(200).json({
       count: books.length,
