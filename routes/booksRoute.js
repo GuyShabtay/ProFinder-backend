@@ -95,7 +95,7 @@ router.put('/books/details/:id', async (request, response) => {
   try {
 
     const { id } = request.params;
-    const { user, userRating } = request.body;
+    // const { user, userRating } = request.body;
     const { commenter, text } = request.body;
 
 
@@ -105,7 +105,7 @@ router.put('/books/details/:id', async (request, response) => {
       return response.status(404).json({ message: 'Book not found' });
     }
 // Push the new rating object to the ratedUsers array
-book.ratedUsers.push({ user, userRating });
+// book.ratedUsers.push({ user, userRating });
 book.comments.push({ commenter, text });
 
 // Save the updated book
