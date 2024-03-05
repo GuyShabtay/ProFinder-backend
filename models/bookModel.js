@@ -14,6 +14,14 @@ const bookSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    phone: {
+      type: Number,
+      required: true,
+    },
+    rating: {
+      type: Number,
+      required: false,
+    },
   },
   {
     timestamps: true,
