@@ -10,11 +10,11 @@ router.post('/', async (request, response) => {
       !request.body.name ||
       !request.body.profession ||
       !request.body.location ||
-      !request.body.phone ||
-      !request.body.rating
+      !request.body.phone
+      
     ) {
       return response.status(400).send({
-        message: 'Send all required fields: name, profession, location,phone,rating',
+        message: 'Send all required fields: name, profession, location,phone',
       });
     }
     const newBook = {
@@ -70,11 +70,10 @@ router.put('/:id', async (request, response) => {
       !request.body.name ||
       !request.body.profession ||
       !request.body.location ||
-      !request.body.phone ||
-      !request.body.rating
+      !request.body.phone 
     ) {
       return response.status(400).send({
-        message: 'Send all required fields: name, profession, location,phone,rating',
+        message: 'Send all required fields: name, profession, location,phone',
       });
     }
 

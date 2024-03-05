@@ -22,9 +22,26 @@ const bookSchema = mongoose.Schema(
       type: Number,
       default: 0,
     },
+    comments: [
+      {
+        commenter: {
+          type: String,
+          required: true,
+        },
+        text: {
+          type: String,
+          required: true,
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+      }
+    ]
   },
   {
     timestamps: true,
   }
 );
+
 export const Book = mongoose.model('Book', bookSchema);
