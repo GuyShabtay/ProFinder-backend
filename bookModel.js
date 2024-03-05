@@ -20,7 +20,7 @@ const bookSchema = mongoose.Schema(
     },
     rating: {
       type: Number,
-      required: false,
+      default: 0,
     },
   },
   {
