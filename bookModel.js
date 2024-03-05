@@ -22,7 +22,12 @@ const bookSchema = mongoose.Schema(
       type: Number,
       default: 0,
     },
-    ratedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'books' }],
+    ratedUsers: [
+      {
+        user: { type: mongoose.Schema.Types.ObjectId},
+        userRating: { type: Number, default: 0 }
+      }
+    ],
     comments: [
       {
         commenter: {
