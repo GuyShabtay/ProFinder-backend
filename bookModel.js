@@ -22,10 +22,7 @@ const bookSchema = mongoose.Schema(
       type: Number,
       default: 0,
     },
-    amountOfRatings: {
-      type: Number,
-      default: 0,
-    },
+    ratedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'books' }],
     comments: [
       {
         commenter: {
