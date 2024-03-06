@@ -99,8 +99,8 @@ router.put('/:id', async (request, response) => {
     response.status(500).send({ message: error.message });
   }
 });
-// Route for add user comments or rating
-router.put('/details/:id', async (request, response) => {
+// Route for add user comments
+router.put('/comment/:id', async (request, response) => {
   try {
 
     const { id } = request.params;
@@ -128,6 +128,38 @@ await book.save();
     response.status(500).send({ message: error.message });
   }
 });
+// Route for add user rating
+router.put('/rating/:id', async (request, response) => {
+  try {
+    const { id } = request.params;
+    const { user, userRating } = request.body;
+
+    const book = await Book.findById(id);
+
+    if (!book) {
+      return response.status(404).json({ message: 'Book not found' });
+    }
+
+    // Push the new rating object to the ratedUsers array
+    book.ratedUsers.push({ user, userRating });
+
+    // Calculate the new average rating
+    const totalRatings = book.ratedUsers.reduce((acc, curr) => acc + curr.userRating, 0);
+    const averageRating = totalRatings / book.ratedUsers.length;
+
+    // Update the book's rating with the new average rating
+    book.rating = averageRating;
+
+    // Save the updated book
+    await book.save();
+
+    return response.status(200).send({ message: 'Book updated successfully' });
+  } catch (error) {
+    console.log(error.message);
+    response.status(500).send({ message: error.message });
+  }
+});
+
 
 // Route for Delete a book
 router.delete('/:id', async (request, response) => {
