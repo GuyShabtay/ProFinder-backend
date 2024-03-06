@@ -10,11 +10,11 @@ router.post('/', async (request, response) => {
       !request.body.name ||
       !request.body.profession ||
       !request.body.location ||
-      !request.body.phone ||
-      !request.body.rating
+      !request.body.phone
+      
     ) {
       return response.status(400).send({
-        message: 'Send all required fields: name, profession, location,phone,rating',
+        message: 'Send all required fields: name, profession, location,phone',
       });
     }
     const newBook = {
@@ -22,7 +22,6 @@ router.post('/', async (request, response) => {
       profession: request.body.profession,
       location: request.body.location,
       phone: request.body.phone,
-      rating: request.body.rating,
     };
 
     const book = await Book.create(newBook);
@@ -78,11 +77,10 @@ router.put('/:id', async (request, response) => {
       !request.body.name ||
       !request.body.profession ||
       !request.body.location ||
-      !request.body.phone ||
-      !request.body.rating
+      !request.body.phone 
     ) {
       return response.status(400).send({
-        message: 'Send all required fields: name, profession, location,phone,rating',
+        message: 'Send all required fields: name, profession, location,phone',
       });
     }
 
@@ -93,6 +91,35 @@ router.put('/:id', async (request, response) => {
     if (!result) {
       return response.status(404).json({ message: 'Book not found' });
     }
+
+    return response.status(200).send({ message: 'Book updated successfully' });
+  } catch (error) {
+    console.log(error.message);
+    response.status(500).send({ message: error.message });
+  }
+});
+// Route for add user comments or rating
+router.put('/books/details/edit/:id', async (request, response) => {
+  try {
+
+    const { id } = request.params;
+    // const { user, userRating } = request.body;
+    const { commenter, text } = request.body;
+console.log(commenter)
+console.log(text)
+
+
+    const book = await Book.findById(id);
+
+    if (!book) {
+      return response.status(404).json({ message: 'Book not found' });
+    }
+// Push the new rating object to the ratedUsers array
+// book.ratedUsers.push({ user, userRating });
+book.comments.push({ commenter, text });
+
+// Save the updated book
+await book.save();
 
     return response.status(200).send({ message: 'Book updated successfully' });
   } catch (error) {
