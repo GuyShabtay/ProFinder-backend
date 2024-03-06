@@ -47,7 +47,7 @@ const bookSchema = mongoose.Schema(
           required: true,
         },
         color: {
-          type: Date,
+          type: String,
           default: getRandomColor(),
         },
         createdAt: {
