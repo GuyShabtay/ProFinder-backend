@@ -31,9 +31,10 @@ const bookSchema = mongoose.Schema(
     },
     ratedUsers: [
       {
-        user: { type: mongoose.Schema.Types.ObjectId},
-        userRating: { type: Number, default: 0 }
-      }
+        // user: { type: mongoose.Schema.Types.ObjectId},
+        user: { type: String },
+        userRating: { type: Number, default: 0 },
+      },
     ],
     comments: [
       {
@@ -53,8 +54,8 @@ const bookSchema = mongoose.Schema(
           type: Date,
           default: Date.now,
         },
-      }
-    ]
+      },
+    ],
   },
   {
     timestamps: true,
