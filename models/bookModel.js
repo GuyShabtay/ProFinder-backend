@@ -1,4 +1,12 @@
 import mongoose from 'mongoose';
+const getRandomColor = () => {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+};
 
 const bookSchema = mongoose.Schema(
   {
@@ -37,6 +45,10 @@ const bookSchema = mongoose.Schema(
         text: {
           type: String,
           required: true,
+        },
+        color: {
+          type: Date,
+          default: getRandomColor(),
         },
         createdAt: {
           type: Date,

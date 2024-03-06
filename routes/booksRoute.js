@@ -91,14 +91,14 @@ router.put('/:id', async (request, response) => {
   }
 });
 // Route for add user comments or rating
-router.put('/books/details/edit/:id', async (request, response) => {
+router.put('/details/:id', async (request, response) => {
   try {
 
     const { id } = request.params;
     // const { user, userRating } = request.body;
     const { commenter, text } = request.body;
-console.log(commenter)
-console.log(text)
+console.log('commenter',commenter)
+console.log('text',text)
 
 
     const book = await Book.findById(id);
