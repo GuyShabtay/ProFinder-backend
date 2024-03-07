@@ -1,7 +1,7 @@
 import express from 'express';
 import { PORT, mongoDBURL } from './config.js';
 import mongoose from 'mongoose';
-import booksRoute from './routes/booksRoute.js';
+import usersRoute from './routes/usersRoute.js';
 import cors from 'cors';
 
 const app = express();
@@ -13,7 +13,7 @@ app.use(express.json());
 // Option 1: Allow All Origins with Default of cors(*)
 app.use(cors({
   origin:["http://localhost:5173"],
-  methods:["GET","POST"],
+  methods:["GET","POST", "PUT"], 
   credentials: true}))
 // Option 2: Allow Custom Origins
 // app.use(
@@ -29,7 +29,7 @@ app.get('/', (request, response) => {
   return response.status(234).send('Welcome To MERN Stack Tutorial');
 });
 
-app.use('/books', booksRoute);
+app.use('/users', usersRoute);
 
 mongoose
   .connect(mongoDBURL)

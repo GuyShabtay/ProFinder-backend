@@ -1,5 +1,4 @@
 import express from 'express';
-import { Book } from '../models/bookModel.js';
 import { User } from '../models/userModel.js';
 import bcrypt from 'bcrypt'
 import  jwt  from 'jsonwebtoken';
@@ -11,7 +10,7 @@ const router = express.Router();
 
 router.use(cookieParser());
 
-// Route for Save a new Book
+// Route for Save a new User
 router.post('/', async (request, response) => {
   try {
     if (
@@ -25,23 +24,23 @@ router.post('/', async (request, response) => {
         message: 'Send all required fields: name, profession, location,phone',
       });
     }
-    const newBook = {
+    const newUser = {
       name: request.body.name,
       profession: request.body.profession,
       location: request.body.location,
       phone: request.body.phone,
     };
 
-    const book = await Book.create(newBook);
+    const user = await User.create(newUser);
 
-    return response.status(201).send(book);
+    return response.status(201).send(user);
   } catch (error) {
     console.log(error.message);
     response.status(500).send({ message: error.message });
   }
 });
 
-// Route for Get All Books from database
+// Route for Get All Users from database
 router.get('/', async (request, response) => {
   try {
     const { q, option } = request.query;
@@ -52,11 +51,11 @@ router.get('/', async (request, response) => {
       query[option] = { $regex: q, $options: 'i' };
     }
 
-    const books = await Book.find(query);
+    const users = await User.find(query);
 
     return response.status(200).json({
-      count: books.length,
-      data: books,
+      count: users.length,
+      data: users,
     });
   } catch (error) {
     console.log(error.message);
@@ -65,21 +64,21 @@ router.get('/', async (request, response) => {
 });
 
 
-// Route for Get One Book from database by id
+// Route for Get One User from database by id
 router.get('/:id', async (request, response) => {
   try {
     const { id } = request.params;
 
-    const book = await Book.findById(id);
+    const user = await User.findById(id);
 
-    return response.status(200).json(book);
+    return response.status(200).json(user);
   } catch (error) {
     console.log(error.message);
     response.status(500).send({ message: error.message });
   }
 });
 
-// Route for Update a Book
+// Route for Update a User
 router.put('/:id', async (request, response) => {
   try {
     if (
@@ -95,13 +94,13 @@ router.put('/:id', async (request, response) => {
 
     const { id } = request.params;
 
-    const result = await Book.findByIdAndUpdate(id, request.body);
+    const result = await User.findByIdAndUpdate(id, request.body);
 
     if (!result) {
-      return response.status(404).json({ message: 'Book not found' });
+      return response.status(404).json({ message: 'User not found' });
     }
 
-    return response.status(200).send({ message: 'Book updated successfully' });
+    return response.status(200).send({ message: 'User updated successfully' });
   } catch (error) {
     console.log(error.message);
     response.status(500).send({ message: error.message });
@@ -118,19 +117,19 @@ console.log('commenter',commenter)
 console.log('text',text)
 
 
-    const book = await Book.findById(id);
+    const user = await User.findById(id);
 
-    if (!book) {
-      return response.status(404).json({ message: 'Book not found' });
+    if (!user) {
+      return response.status(404).json({ message: 'User not found' });
     }
 // Push the new rating object to the ratedUsers array
-// book.ratedUsers.push({ user, userRating });
-book.comments.push({ commenter, text,color });
+// user.ratedUsers.push({ user, userRating });
+user.comments.push({ commenter, text,color });
 
-// Save the updated book
-await book.save();
+// Save the updated user
+await user.save();
 
-    return response.status(200).send({ message: 'Book updated successfully' });
+    return response.status(200).send({ message: 'User updated successfully' });
   } catch (error) {
     console.log(error.message);
     response.status(500).send({ message: error.message });
@@ -140,28 +139,28 @@ await book.save();
 router.put('/rating/:id', async (request, response) => {
   try {
     const { id } = request.params;
-    const { user, userRating } = request.body;
+    const { userId, userRating } = request.body;
 
-    const book = await Book.findById(id);
+    const user = await User.findById(id);
 
-    if (!book) {
-      return response.status(404).json({ message: 'Book not found' });
+    if (!user) {
+      return response.status(404).json({ message: 'User not found' });
     }
 
     // Push the new rating object to the ratedUsers array
-    book.ratedUsers.push({ user, userRating });
+    user.ratedUsers.push({ userId, userRating });
 
     // Calculate the new average rating
-    const totalRatings = book.ratedUsers.reduce((acc, curr) => acc + curr.userRating, 0);
-    const averageRating = totalRatings / book.ratedUsers.length;
+    const totalRatings = user.ratedUsers.reduce((acc, curr) => acc + curr.userRating, 0);
+    const averageRating = totalRatings / user.ratedUsers.length;
 
-    // Update the book's rating with the new average rating
-    book.rating = averageRating;
+    // Update the user's rating with the new average rating
+    user.rating = averageRating;
 
-    // Save the updated book
-    await book.save();
+    // Save the updated user
+    await user.save();
 
-    return response.status(200).send({ message: 'Book updated successfully' });
+    return response.status(200).send({ message: 'User updated successfully' });
   } catch (error) {
     console.log(error.message);
     response.status(500).send({ message: error.message });
@@ -169,18 +168,18 @@ router.put('/rating/:id', async (request, response) => {
 });
 
 
-// Route for Delete a book
+// Route for Delete a user
 router.delete('/:id', async (request, response) => {
   try {
     const { id } = request.params;
 
-    const result = await Book.findByIdAndDelete(id);
+    const result = await User.findByIdAndDelete(id);
 
     if (!result) {
-      return response.status(404).json({ message: 'Book not found' });
+      return response.status(404).json({ message: 'User not found' });
     }
 
-    return response.status(200).send({ message: 'Book deleted successfully' });
+    return response.status(200).send({ message: 'User deleted successfully' });
   } catch (error) {
     console.log(error.message);
     response.status(500).send({ message: error.message });
