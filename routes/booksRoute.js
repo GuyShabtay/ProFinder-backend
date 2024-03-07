@@ -105,7 +105,7 @@ router.put('/comment/:id', async (request, response) => {
 
     const { id } = request.params;
     // const { user, userRating } = request.body;
-    const { commenter, text } = request.body;
+    const { commenter, text,color } = request.body;
 console.log('commenter',commenter)
 console.log('text',text)
 
@@ -117,7 +117,7 @@ console.log('text',text)
     }
 // Push the new rating object to the ratedUsers array
 // book.ratedUsers.push({ user, userRating });
-book.comments.push({ commenter, text });
+book.comments.push({ commenter, text,color });
 
 // Save the updated book
 await book.save();
