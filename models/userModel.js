@@ -8,15 +8,15 @@ const userSchema = mongoose.Schema(
       },
       profession: {
         type: String,
-        required: true,
+        // required: true,
       },
       location: {
         type: String,
-        required: true,
+        // required: true,
       },
       phone: {
         type: String,
-        required: true,
+        // required: true,
       },
       rating: {
         type: Number,
@@ -51,7 +51,7 @@ const userSchema = mongoose.Schema(
       ],
       color: {
         type: String,
-        required: true,
+        // required: true,
       },
         email: {
           type: String,
