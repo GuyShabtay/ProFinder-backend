@@ -16,10 +16,13 @@ const userSchema = mongoose.Schema(
         },
         color: {
           type: String,
-          required: true,
         },
       profiles: [
         {
+          name: {
+            type: String,
+            required: true,
+          },
           profession: {
             type: String,
             required: true,
@@ -55,7 +58,6 @@ const userSchema = mongoose.Schema(
               },
               color: {
                 type: String,
-                required: true,
               },
               createdAt: {
                 type: Date,

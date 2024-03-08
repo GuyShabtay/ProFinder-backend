@@ -10,28 +10,37 @@ const router = express.Router();
 
 router.use(cookieParser());
 
-// Route for Save a new User
+// Route for Save a new Profile
+
 router.post('/', async (request, response) => {
   try {
-    if (
-      !request.body.name ||
-      !request.body.profession ||
-      !request.body.location ||
-      !request.body.phone
-      
-    ) {
+    const { name, profession, location, phone } = request.body;
+
+    if (!name || !profession || !location || !phone) {
       return response.status(400).send({
-        message: 'Send all required fields: name, profession, location,phone',
+        message: 'Send all required fields: email, name, profession, location, phone',
       });
     }
-    const newUser = {
-      name: request.body.name,
-      profession: request.body.profession,
-      location: request.body.location,
-      phone: request.body.phone,
+
+    // Find the user by email
+    const user = await User.findOne({ name });
+
+    if (!user) {
+      return response.status(404).send({ message: 'User not found' });
+    }
+
+    // Create a new profile object
+    const newProfile = {
+      profession,
+      location,
+      phone,
     };
 
-    const user = await User.create(newUser);
+    // Push the new profile into the profiles array of the user
+    user.profiles.push(newProfile);
+
+    // Save the updated user
+    await user.save();
 
     return response.status(201).send(user);
   } catch (error) {
@@ -39,6 +48,7 @@ router.post('/', async (request, response) => {
     response.status(500).send({ message: error.message });
   }
 });
+
 
 // Route for Get All Users from database
 router.get('/', async (request, response) => {
@@ -193,11 +203,10 @@ router.post('/register', async (request, response) => {
     if (
       !request.body.name ||
       !request.body.email ||
-      !request.body.phone ||
       !request.body.password
     ) {
       return response.status(400).send({
-        message: 'Send all required fields: name, email, phone,password',
+        message: 'Send all required fields: name, email,password',
       });
     }
     
@@ -206,7 +215,6 @@ router.post('/register', async (request, response) => {
     const newUser = {
       name: request.body.name,
       email: request.body.email,
-      phone: request.body.phone,
       password: hashedPassword,
     };
 
