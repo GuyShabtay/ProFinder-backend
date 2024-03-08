@@ -18,7 +18,7 @@ router.post('/', async (request, response) => {
 
     if (!name || !profession || !location || !phone) {
       return response.status(400).send({
-        message: 'Send all required fields: email, name, profession, location, phone',
+        message: 'Send all required fields: name, profession, location, phone',
       });
     }
 
@@ -31,6 +31,7 @@ router.post('/', async (request, response) => {
 
     // Create a new profile object
     const newProfile = {
+      name,
       profession,
       location,
       phone,
