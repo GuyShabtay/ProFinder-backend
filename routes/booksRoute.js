@@ -1,7 +1,14 @@
 import express from 'express';
 import { Book } from '../models/bookModel.js';
 
+import { User } from '../models/userModel.js';
+import bcrypt from 'bcrypt'
+import  jwt  from 'jsonwebtoken';
+import cookieParser from 'cookie-parser';
+
 const router = express.Router();
+router.use(cookieParser());
+
 
 // Route for Save a new Book
 router.post('/', async (request, response) => {
@@ -11,12 +18,12 @@ router.post('/', async (request, response) => {
       !request.body.profession ||
       !request.body.location ||
       !request.body.phone
-      
     ) {
       return response.status(400).send({
-        message: 'Send all required fields: name, profession, location,phone',
+        message: 'Send all required fields: name, profession, location, phone',
       });
     }
+
     const newBook = {
       name: request.body.name,
       profession: request.body.profession,
@@ -26,12 +33,20 @@ router.post('/', async (request, response) => {
 
     const book = await Book.create(newBook);
 
-    return response.status(201).send(book);
+    // Update the user's books array with the newly created book's ID
+    const user = await User.findOneAndUpdate(
+      { name: request.body.name }, // Find the user by name
+      { $push: { books: book._id } }, // Add the book's ID to the books array
+      { new: true }
+    );
+
+    return response.status(201).send({ book, user });
   } catch (error) {
     console.log(error.message);
     response.status(500).send({ message: error.message });
   }
 });
+
 
 // Route for Get All Books from database
 router.get('/', async (request, response) => {
@@ -177,6 +192,69 @@ router.delete('/:id', async (request, response) => {
     console.log(error.message);
     response.status(500).send({ message: error.message });
   }
+});
+
+
+router.post('/register', async (request, response) => {
+  try {
+    if (
+      !request.body.name ||
+      !request.body.email ||
+      !request.body.phone ||
+      !request.body.password
+    ) {
+      return response.status(400).send({
+        message: 'Send all required fields: name, email, phone,password',
+      });
+    }
+    
+    const hashedPassword = await bcrypt.hash(request.body.password, 10);
+   
+    const newUser = {
+      name: request.body.name,
+      email: request.body.email,
+      phone: request.body.phone,
+      password: hashedPassword,
+    };
+
+    
+    const user = await User.create(newUser);
+
+    return response.status(201).send(user);
+  } catch (error) {
+    console.log(error.message);
+    response.status(500).send({ message: error.message });
+  }
+});
+
+
+
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  User.findOne({email: email})
+  .then(user => {
+      console.log("User:", user);
+      if(user) {
+        bcrypt.compare (password, user.password, (err, response) => {
+          if(err) 
+          {
+            return res.json("the password is incorrect")
+          }
+          else {
+            const token = jwt.sign ({email: user.email}, "jwt-secret-key", {expiresIn: "1d"})
+            res.cookie("token", token) ;
+            console.log("Username:", user.name);
+            res.json({
+              message: "Success",
+              username: user.name,
+              token: token})
+            }
+          })
+      }
+      else{
+        res.json("no record")
+      }
+  })
 });
 
 export default router;
