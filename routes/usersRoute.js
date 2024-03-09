@@ -52,6 +52,29 @@ router.post('/', async (request, response) => {
 
 
 // Route for Get All Users from database
+
+// router.get('/', async (request, response) => {
+//   try {
+//     const { q, option } = request.query;
+
+//     let query = {};
+
+//     if (q && option) {
+//       query[option] = { $regex: q, $options: 'i' };
+//     }
+
+//     const users = await User.find(query);
+
+//     return response.status(200).json({
+//       count: users.length,
+//       data: users,
+//     });
+//   } catch (error) {
+//     console.log(error.message);
+//     response.status(500).send({ message: error.message });
+//   }
+// });
+
 router.get('/', async (request, response) => {
   try {
     const { q, option } = request.query;
@@ -59,11 +82,12 @@ router.get('/', async (request, response) => {
     let query = {};
 
     if (q && option) {
-      query[option] = { $regex: q, $options: 'i' };
+      // Search within profiles
+      query[`profiles.${option}`] = { $regex: q, $options: 'i' };
     }
 
-    const users = await User.find(query);
-
+    const users = await User.find(query).populate('profiles');
+// console.log('users',user)
     return response.status(200).json({
       count: users.length,
       data: users,
@@ -75,31 +99,85 @@ router.get('/', async (request, response) => {
 });
 
 
+
+
+
+
+
+
+
+
+
 // Route for Get One User from database by id
+// router.get('/:id', async (request, response) => {
+//   try {
+//     const { id } = request.params;
+
+//     const user = await User.findById(id);
+
+//     return response.status(200).json(user);
+//   } catch (error) {
+//     console.log(error.message);
+//     response.status(500).send({ message: error.message });
+//   }
+// });
+
+
 router.get('/:id', async (request, response) => {
   try {
     const { id } = request.params;
 
-    const user = await User.findById(id);
+    // Find all users
+    const users = await User.find();
 
-    return response.status(200).json(user);
+    // Initialize variable to store found user
+    let foundProfile = null;
+
+    // Iterate over each user
+    for (let i = 0; i < users.length; i++) {
+      const user = users[i];
+
+      // Iterate over profiles array of the current user
+      for (let j = 0; j < user.profiles.length; j++) {
+        const profile = user.profiles[j];
+
+        // Check if the profile ID matches the requested ID
+        if (profile.id === id) {
+          foundProfile = profile;
+          break; // Exit the loop once a match is found
+        }
+      }
+
+      // If a match is found, exit the outer loop as well
+      if (foundProfile) {
+        break;
+      }
+    }
+
+    if (foundProfile) {
+      return response.status(200).json(foundProfile);
+    } else {
+      return response.status(404).json({ message: 'User not found' });
+    }
   } catch (error) {
     console.log(error.message);
     response.status(500).send({ message: error.message });
   }
 });
 
+
+
+
 // Route for Update a User
 router.put('/:id', async (request, response) => {
   try {
     if (
-      !request.body.name ||
       !request.body.profession ||
       !request.body.location ||
       !request.body.phone 
     ) {
       return response.status(400).send({
-        message: 'Send all required fields: name, profession, location,phone',
+        message: 'Send all required fields:profession, location,phone',
       });
     }
 
