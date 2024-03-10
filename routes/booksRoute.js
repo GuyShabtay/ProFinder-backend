@@ -90,13 +90,12 @@ router.get('/:id', async (request, response) => {
 router.put('/:id', async (request, response) => {
   try {
     if (
-      !request.body.name ||
       !request.body.profession ||
       !request.body.location ||
       !request.body.phone 
     ) {
       return response.status(400).send({
-        message: 'Send all required fields: name, profession, location,phone',
+        message: 'Send all required fields: profession, location,phone',
       });
     }
 
@@ -231,30 +230,52 @@ router.post('/register', async (request, response) => {
 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  User.findOne({email: email})
-  .then(user => {
-      console.log("User:", user);
-      if(user) {
-        bcrypt.compare (password, user.password, (err, response) => {
-          if(err) 
-          {
-            return res.json("the password is incorrect")
-          }
-          else {
-            const token = jwt.sign ({email: user.email}, "jwt-secret-key", {expiresIn: "1d"})
-            res.cookie("token", token) ;
-            console.log("Username:", user.name);
-            res.json({
-              message: "Success",
-              username: user.name,
-              token: token})
-            }
-          })
+  try {
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    bcrypt.compare(password, user.password, (err, response) => {
+      if (err || !response) {
+        return res.status(401).json({ message: "Incorrect password" });
+      } else {
+        const token = jwt.sign({ email: user.email }, "jwt-secret-key", { expiresIn: "1d" });
+        res.cookie("token", token);
+        console.log("Username:", user.name);
+        res.json({
+          message: "Success",
+          username: user.name,
+          token: token
+        });
       }
-      else{
-        res.json("no record")
-      }
-  })
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 });
+
+// Route for Get User from database by name
+router.get('/user', async (request, response) => {
+  try {
+    const name = request.query.name; // Access query parameter instead of request body
+    console.log(name);
+
+    const user = await User.findOne({ name: name });
+    console.log(user);
+
+    if (!user) {
+      return response.status(401).json({ message: "User not found" });
+    }
+    console.log(user.name);
+
+    return response.status(200).json(user);
+  } catch (error) {
+    console.log(error.message);
+    response.status(500).send({ message: error.message });
+  }
+});
+
 
 export default router;
