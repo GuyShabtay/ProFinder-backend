@@ -201,16 +201,24 @@ router.post('/register', async (request, response) => {
     if (
       !request.body.name ||
       !request.body.email ||
-      !request.body.password||
+      !request.body.password ||
       !request.body.color
     ) {
       return response.status(400).send({
-        message: 'Send all required fields: name, email, phone,password,color',
+        message: 'Send all required fields: name, email, password, color',
       });
     }
-    
+
+    // Check if the email already exists
+    const existingUser = await User.findOne({ email: request.body.email });
+    if (existingUser) {
+      return response.status(400).send({
+        message: 'User with this email already exists',
+      });
+    }
+
     const hashedPassword = await bcrypt.hash(request.body.password, 10);
-   
+
     const newUser = {
       name: request.body.name,
       email: request.body.email,
@@ -218,7 +226,6 @@ router.post('/register', async (request, response) => {
       color: request.body.color,
     };
 
-    
     const user = await User.create(newUser);
 
     return response.status(201).send(user);
@@ -227,6 +234,7 @@ router.post('/register', async (request, response) => {
     response.status(500).send({ message: error.message });
   }
 });
+
 
 
 
@@ -257,45 +265,5 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
-router.post("/users", async (req, res) => {
-  const { email } = req.body;
-  try {
-    const user = await User.findOne({ email: email });
-    if (!user) {
-      return res.status(401).json({ message: "User not found" });
-    }
-
-   
-        console.log("Username:", user.name);
-        res.json(user);
-     
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-
-
-// router.get('/user', async (request, response) => {
-//   try {
-//     const { email } = request.query;
-
-//     const user = await User.findOne({ email: email });
-
-//     if (!user) {
-//       return response.status(404).json({ message: "User not found" });
-//     }
-
-//     return response.status(200).json({
-//       data: user,
-//     });
-//   } catch (error) {
-//     console.log(error.message);
-//     response.status(500).send({ message: error.message });
-//   }
-// });
-
-
-
 
 export default router;
