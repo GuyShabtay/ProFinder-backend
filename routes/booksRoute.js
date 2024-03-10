@@ -15,17 +15,19 @@ router.post('/', async (request, response) => {
   try {
     if (
       !request.body.name ||
+      !request.body.email ||
       !request.body.profession ||
       !request.body.location ||
       !request.body.phone
     ) {
       return response.status(400).send({
-        message: 'Send all required fields: name, profession, location, phone',
+        message: 'Send all required fields: name,email, profession, location, phone',
       });
     }
 
     const newBook = {
       name: request.body.name,
+      email: request.body.email,
       profession: request.body.profession,
       location: request.body.location,
       phone: request.body.phone,
@@ -200,10 +202,11 @@ router.post('/register', async (request, response) => {
       !request.body.name ||
       !request.body.email ||
       !request.body.phone ||
-      !request.body.password
+      !request.body.password||
+      !request.body.color
     ) {
       return response.status(400).send({
-        message: 'Send all required fields: name, email, phone,password',
+        message: 'Send all required fields: name, email, phone,password,color',
       });
     }
     
@@ -214,6 +217,7 @@ router.post('/register', async (request, response) => {
       email: request.body.email,
       phone: request.body.phone,
       password: hashedPassword,
+      color: request.body.color,
     };
 
     
@@ -255,27 +259,45 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
+router.post("/users1", async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
+    }
 
-// Route for Get User from database by name
+   
+        console.log("Username:", user.name);
+        res.json(user);
+     
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+
 router.get('/user', async (request, response) => {
   try {
-    const name = request.query.name; // Access query parameter instead of request body
-    console.log(name);
+    const { email } = request.query;
 
-    const user = await User.findOne({ name: name });
-    console.log(user);
+    const user = await User.findOne({ email: email });
 
     if (!user) {
-      return response.status(401).json({ message: "User not found" });
+      return response.status(404).json({ message: "User not found" });
     }
-    console.log(user.name);
 
-    return response.status(200).json(user);
+    return response.status(200).json({
+      data: user,
+    });
   } catch (error) {
     console.log(error.message);
     response.status(500).send({ message: error.message });
   }
 });
+
+
 
 
 export default router;

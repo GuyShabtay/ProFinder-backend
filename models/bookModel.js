@@ -6,6 +6,10 @@ const bookSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    email: {
+      type: String,
+      required: true,
+    },
     profession: {
       type: String,
       required: true,

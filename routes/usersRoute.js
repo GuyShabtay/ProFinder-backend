@@ -1,57 +1,79 @@
-import express from 'express';
-import { User } from '../models/userModel.js';
-import bcrypt from 'bcrypt'
-import  jwt  from 'jsonwebtoken';
-import cookieParser from 'cookie-parser';
+// import express from 'express';
+// import { User } from '../models/userModel.js';
+// import bcrypt from 'bcrypt'
+// import  jwt  from 'jsonwebtoken';
+// import cookieParser from 'cookie-parser';
 
-const router = express.Router();
-// const jwt = require('jsonwebtoken');
-// const cookieParser=require('cookie-parser');
+// const router = express.Router();
+// // const jwt = require('jsonwebtoken');
+// // const cookieParser=require('cookie-parser');
 
-router.use(cookieParser());
+// router.use(cookieParser());
 
-// Route for Save a new Profile
+// // Route for Save a new Profile
 
-router.post('/', async (request, response) => {
-  try {
-    const { name, profession, location, phone } = request.body;
+// router.post('/', async (request, response) => {
+//   try {
+//     const { name, profession, location, phone } = request.body;
 
-    if (!name || !profession || !location || !phone) {
-      return response.status(400).send({
-        message: 'Send all required fields: name, profession, location, phone',
-      });
-    }
+//     if (!name || !profession || !location || !phone) {
+//       return response.status(400).send({
+//         message: 'Send all required fields: name, profession, location, phone',
+//       });
+//     }
 
-    // Find the user by email
-    const user = await User.findOne({ name });
+//     // Find the user by email
+//     const user = await User.findOne({ name });
 
-    if (!user) {
-      return response.status(404).send({ message: 'User not found' });
-    }
+//     if (!user) {
+//       return response.status(404).send({ message: 'User not found' });
+//     }
 
-    // Create a new profile object
-    const newProfile = {
-      name,
-      profession,
-      location,
-      phone,
-    };
+//     // Create a new profile object
+//     const newProfile = {
+//       name,
+//       profession,
+//       location,
+//       phone,
+//     };
 
-    // Push the new profile into the profiles array of the user
-    user.profiles.push(newProfile);
+//     // Push the new profile into the profiles array of the user
+//     user.profiles.push(newProfile);
 
-    // Save the updated user
-    await user.save();
+//     // Save the updated user
+//     await user.save();
 
-    return response.status(201).send(user);
-  } catch (error) {
-    console.log(error.message);
-    response.status(500).send({ message: error.message });
-  }
-});
+//     return response.status(201).send(user);
+//   } catch (error) {
+//     console.log(error.message);
+//     response.status(500).send({ message: error.message });
+//   }
+// });
 
 
-// Route for Get All Users from database
+// // Route for Get All Users from database
+
+// // router.get('/', async (request, response) => {
+// //   try {
+// //     const { q, option } = request.query;
+
+// //     let query = {};
+
+// //     if (q && option) {
+// //       query[option] = { $regex: q, $options: 'i' };
+// //     }
+
+// //     const users = await User.find(query);
+
+// //     return response.status(200).json({
+// //       count: users.length,
+// //       data: users,
+// //     });
+// //   } catch (error) {
+// //     console.log(error.message);
+// //     response.status(500).send({ message: error.message });
+// //   }
+// // });
 
 // router.get('/', async (request, response) => {
 //   try {
@@ -60,11 +82,12 @@ router.post('/', async (request, response) => {
 //     let query = {};
 
 //     if (q && option) {
-//       query[option] = { $regex: q, $options: 'i' };
+//       // Search within profiles
+//       query[`profiles.${option}`] = { $regex: q, $options: 'i' };
 //     }
 
-//     const users = await User.find(query);
-
+//     const users = await User.find(query).populate('profiles');
+// // console.log('users',user)
 //     return response.status(200).json({
 //       count: users.length,
 //       data: users,
@@ -75,28 +98,6 @@ router.post('/', async (request, response) => {
 //   }
 // });
 
-router.get('/', async (request, response) => {
-  try {
-    const { q, option } = request.query;
-
-    let query = {};
-
-    if (q && option) {
-      // Search within profiles
-      query[`profiles.${option}`] = { $regex: q, $options: 'i' };
-    }
-
-    const users = await User.find(query).populate('profiles');
-// console.log('users',user)
-    return response.status(200).json({
-      count: users.length,
-      data: users,
-    });
-  } catch (error) {
-    console.log(error.message);
-    response.status(500).send({ message: error.message });
-  }
-});
 
 
 
@@ -107,15 +108,57 @@ router.get('/', async (request, response) => {
 
 
 
+// // Route for Get One User from database by id
+// // router.get('/:id', async (request, response) => {
+// //   try {
+// //     const { id } = request.params;
 
-// Route for Get One User from database by id
+// //     const user = await User.findById(id);
+
+// //     return response.status(200).json(user);
+// //   } catch (error) {
+// //     console.log(error.message);
+// //     response.status(500).send({ message: error.message });
+// //   }
+// // });
+
+
 // router.get('/:id', async (request, response) => {
 //   try {
 //     const { id } = request.params;
 
-//     const user = await User.findById(id);
+//     // Find all users
+//     const users = await User.find();
 
-//     return response.status(200).json(user);
+//     // Initialize variable to store found user
+//     let foundProfile = null;
+
+//     // Iterate over each user
+//     for (let i = 0; i < users.length; i++) {
+//       const user = users[i];
+
+//       // Iterate over profiles array of the current user
+//       for (let j = 0; j < user.profiles.length; j++) {
+//         const profile = user.profiles[j];
+
+//         // Check if the profile ID matches the requested ID
+//         if (profile.id === id) {
+//           foundProfile = profile;
+//           break; // Exit the loop once a match is found
+//         }
+//       }
+
+//       // If a match is found, exit the outer loop as well
+//       if (foundProfile) {
+//         break;
+//       }
+//     }
+
+//     if (foundProfile) {
+//       return response.status(200).json(foundProfile);
+//     } else {
+//       return response.status(404).json({ message: 'User not found' });
+//     }
 //   } catch (error) {
 //     console.log(error.message);
 //     response.status(500).send({ message: error.message });
@@ -123,219 +166,176 @@ router.get('/', async (request, response) => {
 // });
 
 
-router.get('/:id', async (request, response) => {
-  try {
-    const { id } = request.params;
-
-    // Find all users
-    const users = await User.find();
-
-    // Initialize variable to store found user
-    let foundProfile = null;
-
-    // Iterate over each user
-    for (let i = 0; i < users.length; i++) {
-      const user = users[i];
-
-      // Iterate over profiles array of the current user
-      for (let j = 0; j < user.profiles.length; j++) {
-        const profile = user.profiles[j];
-
-        // Check if the profile ID matches the requested ID
-        if (profile.id === id) {
-          foundProfile = profile;
-          break; // Exit the loop once a match is found
-        }
-      }
-
-      // If a match is found, exit the outer loop as well
-      if (foundProfile) {
-        break;
-      }
-    }
-
-    if (foundProfile) {
-      return response.status(200).json(foundProfile);
-    } else {
-      return response.status(404).json({ message: 'User not found' });
-    }
-  } catch (error) {
-    console.log(error.message);
-    response.status(500).send({ message: error.message });
-  }
-});
 
 
+// // Route for Update a User
+// router.put('/:id', async (request, response) => {
+//   try {
+//     if (
+//       !request.body.profession ||
+//       !request.body.location ||
+//       !request.body.phone 
+//     ) {
+//       return response.status(400).send({
+//         message: 'Send all required fields:profession, location,phone',
+//       });
+//     }
+
+//     const { id } = request.params;
+
+//     const result = await User.findByIdAndUpdate(id, request.body);
+
+//     if (!result) {
+//       return response.status(404).json({ message: 'User not found' });
+//     }
+
+//     return response.status(200).send({ message: 'User updated successfully' });
+//   } catch (error) {
+//     console.log(error.message);
+//     response.status(500).send({ message: error.message });
+//   }
+// });
+// // Route for add user comments
+// router.put('/comment/:id', async (request, response) => {
+//   try {
+
+//     const { id } = request.params;
+//     // const { user, userRating } = request.body;
+//     const { commenter, text,color } = request.body;
+// console.log('commenter',commenter)
+// console.log('text',text)
 
 
-// Route for Update a User
-router.put('/:id', async (request, response) => {
-  try {
-    if (
-      !request.body.profession ||
-      !request.body.location ||
-      !request.body.phone 
-    ) {
-      return response.status(400).send({
-        message: 'Send all required fields:profession, location,phone',
-      });
-    }
+//     const user = await User.findById(id);
 
-    const { id } = request.params;
+//     if (!user) {
+//       return response.status(404).json({ message: 'User not found' });
+//     }
+// // Push the new rating object to the ratedUsers array
+// // user.ratedUsers.push({ user, userRating });
+// user.comments.push({ commenter, text,color });
 
-    const result = await User.findByIdAndUpdate(id, request.body);
+// // Save the updated user
+// await user.save();
 
-    if (!result) {
-      return response.status(404).json({ message: 'User not found' });
-    }
+//     return response.status(200).send({ message: 'User updated successfully' });
+//   } catch (error) {
+//     console.log(error.message);
+//     response.status(500).send({ message: error.message });
+//   }
+// });
+// // Route for add user rating
+// router.put('/rating/:id', async (request, response) => {
+//   try {
+//     const { id } = request.params;
+//     const { userId, userRating } = request.body;
 
-    return response.status(200).send({ message: 'User updated successfully' });
-  } catch (error) {
-    console.log(error.message);
-    response.status(500).send({ message: error.message });
-  }
-});
-// Route for add user comments
-router.put('/comment/:id', async (request, response) => {
-  try {
+//     const user = await User.findById(id);
 
-    const { id } = request.params;
-    // const { user, userRating } = request.body;
-    const { commenter, text,color } = request.body;
-console.log('commenter',commenter)
-console.log('text',text)
+//     if (!user) {
+//       return response.status(404).json({ message: 'User not found' });
+//     }
 
+//     // Push the new rating object to the ratedUsers array
+//     user.ratedUsers.push({ userId, userRating });
 
-    const user = await User.findById(id);
+//     // Calculate the new average rating
+//     const totalRatings = user.ratedUsers.reduce((acc, curr) => acc + curr.userRating, 0);
+//     const averageRating = totalRatings / user.ratedUsers.length;
 
-    if (!user) {
-      return response.status(404).json({ message: 'User not found' });
-    }
-// Push the new rating object to the ratedUsers array
-// user.ratedUsers.push({ user, userRating });
-user.comments.push({ commenter, text,color });
+//     // Update the user's rating with the new average rating
+//     user.rating = averageRating;
 
-// Save the updated user
-await user.save();
+//     // Save the updated user
+//     await user.save();
 
-    return response.status(200).send({ message: 'User updated successfully' });
-  } catch (error) {
-    console.log(error.message);
-    response.status(500).send({ message: error.message });
-  }
-});
-// Route for add user rating
-router.put('/rating/:id', async (request, response) => {
-  try {
-    const { id } = request.params;
-    const { userId, userRating } = request.body;
-
-    const user = await User.findById(id);
-
-    if (!user) {
-      return response.status(404).json({ message: 'User not found' });
-    }
-
-    // Push the new rating object to the ratedUsers array
-    user.ratedUsers.push({ userId, userRating });
-
-    // Calculate the new average rating
-    const totalRatings = user.ratedUsers.reduce((acc, curr) => acc + curr.userRating, 0);
-    const averageRating = totalRatings / user.ratedUsers.length;
-
-    // Update the user's rating with the new average rating
-    user.rating = averageRating;
-
-    // Save the updated user
-    await user.save();
-
-    return response.status(200).send({ message: 'User updated successfully' });
-  } catch (error) {
-    console.log(error.message);
-    response.status(500).send({ message: error.message });
-  }
-});
+//     return response.status(200).send({ message: 'User updated successfully' });
+//   } catch (error) {
+//     console.log(error.message);
+//     response.status(500).send({ message: error.message });
+//   }
+// });
 
 
-// Route for Delete a user
-router.delete('/:id', async (request, response) => {
-  try {
-    const { id } = request.params;
+// // Route for Delete a user
+// router.delete('/:id', async (request, response) => {
+//   try {
+//     const { id } = request.params;
 
-    const result = await User.findByIdAndDelete(id);
+//     const result = await User.findByIdAndDelete(id);
 
-    if (!result) {
-      return response.status(404).json({ message: 'User not found' });
-    }
+//     if (!result) {
+//       return response.status(404).json({ message: 'User not found' });
+//     }
 
-    return response.status(200).send({ message: 'User deleted successfully' });
-  } catch (error) {
-    console.log(error.message);
-    response.status(500).send({ message: error.message });
-  }
-});
+//     return response.status(200).send({ message: 'User deleted successfully' });
+//   } catch (error) {
+//     console.log(error.message);
+//     response.status(500).send({ message: error.message });
+//   }
+// });
 
 
 
-router.post('/register', async (request, response) => {
-  try {
-    if (
-      !request.body.name ||
-      !request.body.email ||
-      !request.body.password
-    ) {
-      return response.status(400).send({
-        message: 'Send all required fields: name, email,password',
-      });
-    }
+// router.post('/register', async (request, response) => {
+//   try {
+//     if (
+//       !request.body.name ||
+//       !request.body.email ||
+//       !request.body.password
+//     ) {
+//       return response.status(400).send({
+//         message: 'Send all required fields: name, email,password',
+//       });
+//     }
     
-    const hashedPassword = await bcrypt.hash(request.body.password, 10);
+//     const hashedPassword = await bcrypt.hash(request.body.password, 10);
    
-    const newUser = {
-      name: request.body.name,
-      email: request.body.email,
-      password: hashedPassword,
-    };
+//     const newUser = {
+//       name: request.body.name,
+//       email: request.body.email,
+//       password: hashedPassword,
+//     };
 
     
-    const user = await User.create(newUser);
+//     const user = await User.create(newUser);
 
-    return response.status(201).send(user);
-  } catch (error) {
-    console.log(error.message);
-    response.status(500).send({ message: error.message });
-  }
-});
-
-
-
-router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  User.findOne({email: email})
-  .then(user => {
-      console.log("User:", user);
-      if(user) {
-        bcrypt.compare (password, user.password, (err, response) => {
-          if(err) 
-          {
-            return res.json("the password is incorrect")
-          }
-          else {
-            const token = jwt.sign ({email: user.email}, "jwt-secret-key", {expiresIn: "1d"})
-            res.cookie("token", token) ;
-            console.log("Username:", user.name);
-            res.json({
-              message: "Success",
-              username: user.name,
-              token: token})
-            }
-          })
-      }
-      else{
-        res.json("no record")
-      }
-  })
-});
+//     return response.status(201).send(user);
+//   } catch (error) {
+//     console.log(error.message);
+//     response.status(500).send({ message: error.message });
+//   }
+// });
 
 
-export default router;
+
+// router.post("/login", async (req, res) => {
+//   const { email, password } = req.body;
+//   User.findOne({email: email})
+//   .then(user => {
+//       console.log("User:", user);
+//       if(user) {
+//         bcrypt.compare (password, user.password, (err, response) => {
+//           if(err) 
+//           {
+//             return res.json("the password is incorrect")
+//           }
+//           else {
+//             const token = jwt.sign ({email: user.email}, "jwt-secret-key", {expiresIn: "1d"})
+//             res.cookie("token", token) ;
+//             console.log("Username:", user.name);
+//             res.json({
+//               message: "Success",
+//               username: user.name,
+//               token: token})
+//             }
+//           })
+//       }
+//       else{
+//         res.json("no record")
+//       }
+//   })
+// });
+
+
+// export default router;
