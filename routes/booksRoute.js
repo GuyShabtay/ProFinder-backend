@@ -37,7 +37,7 @@ router.post('/', async (request, response) => {
 
     // Update the user's books array with the newly created book's ID
     const user = await User.findOneAndUpdate(
-      { name: request.body.name }, // Find the user by name
+      { email: request.body.email }, // Find the user by email
       { $push: { books: book._id } }, // Add the book's ID to the books array
       { new: true }
     );
@@ -201,7 +201,6 @@ router.post('/register', async (request, response) => {
     if (
       !request.body.name ||
       !request.body.email ||
-      !request.body.phone ||
       !request.body.password||
       !request.body.color
     ) {
@@ -215,7 +214,6 @@ router.post('/register', async (request, response) => {
     const newUser = {
       name: request.body.name,
       email: request.body.email,
-      phone: request.body.phone,
       password: hashedPassword,
       color: request.body.color,
     };
@@ -259,7 +257,7 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
-router.post("/users1", async (req, res) => {
+router.post("/users", async (req, res) => {
   const { email } = req.body;
   try {
     const user = await User.findOne({ email: email });
@@ -278,24 +276,24 @@ router.post("/users1", async (req, res) => {
 });
 
 
-router.get('/user', async (request, response) => {
-  try {
-    const { email } = request.query;
+// router.get('/user', async (request, response) => {
+//   try {
+//     const { email } = request.query;
 
-    const user = await User.findOne({ email: email });
+//     const user = await User.findOne({ email: email });
 
-    if (!user) {
-      return response.status(404).json({ message: "User not found" });
-    }
+//     if (!user) {
+//       return response.status(404).json({ message: "User not found" });
+//     }
 
-    return response.status(200).json({
-      data: user,
-    });
-  } catch (error) {
-    console.log(error.message);
-    response.status(500).send({ message: error.message });
-  }
-});
+//     return response.status(200).json({
+//       data: user,
+//     });
+//   } catch (error) {
+//     console.log(error.message);
+//     response.status(500).send({ message: error.message });
+//   }
+// });
 
 
 
