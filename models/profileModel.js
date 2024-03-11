@@ -28,8 +28,7 @@ const profileSchema = mongoose.Schema(
     },
     ratedUsers: [
       {
-        // user: { type: mongoose.Schema.Types.ObjectId},
-        user: { type: String},
+        email: { type: String},
         userRating: { type: Number, default: 0 }
       }
     ],

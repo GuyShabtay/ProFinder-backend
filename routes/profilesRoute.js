@@ -120,12 +120,7 @@ router.put('/comment/:id', async (request, response) => {
   try {
 
     const { id } = request.params;
-    // const { user, userRating } = request.body;
     const { commenter, text,color } = request.body;
-console.log('commenter',commenter)
-console.log('text',text)
-
-
     const profile = await Profile.findById(id);
 
     if (!profile) {
@@ -148,7 +143,7 @@ await profile.save();
 router.put('/rating/:id', async (request, response) => {
   try {
     const { id } = request.params;
-    const { user, userRating } = request.body;
+    const { email, userRating } = request.body;
 
     const profile = await Profile.findById(id);
 
@@ -157,7 +152,7 @@ router.put('/rating/:id', async (request, response) => {
     }
 
     // Push the new rating object to the ratedUsers array
-    profile.ratedUsers.push({ user, userRating });
+    profile.ratedUsers.push({ email, userRating });
 
     // Calculate the new average rating
     const totalRatings = profile.ratedUsers.reduce((acc, curr) => acc + curr.userRating, 0);
@@ -252,11 +247,12 @@ router.post("/login", async (req, res) => {
       } else {
         const token = jwt.sign({ email: user.email }, "jwt-secret-key", { expiresIn: "1d" });
         res.cookie("token", token);
-        console.log("Username:", user.name);
         res.json({
           message: "Success",
+          token: token,
           username: user.name,
-          token: token
+          email: user.email,
+          color: user.color,
         });
       }
     });
