@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const bookSchema = mongoose.Schema(
+const profileSchema = mongoose.Schema(
   {
     name: {
       type: String,
@@ -59,4 +59,4 @@ const bookSchema = mongoose.Schema(
   }
 );
 
-export const Book = mongoose.model('Book', bookSchema);
+export const Profile = mongoose.model('Profile', profileSchema);

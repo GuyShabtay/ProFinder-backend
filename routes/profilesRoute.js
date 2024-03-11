@@ -1,5 +1,5 @@
 import express from 'express';
-import { Book } from '../models/bookModel.js';
+import { Profile } from '../models/profileModel.js';
 
 import { User } from '../models/userModel.js';
 import bcrypt from 'bcrypt'
@@ -10,7 +10,7 @@ const router = express.Router();
 router.use(cookieParser());
 
 
-// Route for Save a new Book
+// Route for Save a new Profile
 router.post('/', async (request, response) => {
   try {
     if (
@@ -25,7 +25,7 @@ router.post('/', async (request, response) => {
       });
     }
 
-    const newBook = {
+    const newProfile = {
       name: request.body.name,
       email: request.body.email,
       profession: request.body.profession,
@@ -33,16 +33,16 @@ router.post('/', async (request, response) => {
       phone: request.body.phone,
     };
 
-    const book = await Book.create(newBook);
+    const profile = await Profile.create(newProfile);
 
-    // Update the user's books array with the newly created book's ID
+    // Update the user's profiles array with the newly created profile's ID
     const user = await User.findOneAndUpdate(
       { email: request.body.email }, // Find the user by email
-      { $push: { books: book._id } }, // Add the book's ID to the books array
+      { $push: { profiles: profile._id } }, // Add the profile's ID to the profiles array
       { new: true }
     );
 
-    return response.status(201).send({ book, user });
+    return response.status(201).send({ profile, user });
   } catch (error) {
     console.log(error.message);
     response.status(500).send({ message: error.message });
@@ -50,7 +50,7 @@ router.post('/', async (request, response) => {
 });
 
 
-// Route for Get All Books from database
+// Route for Get All Profiles from database
 router.get('/', async (request, response) => {
   try {
     const { q, option } = request.query;
@@ -61,11 +61,11 @@ router.get('/', async (request, response) => {
       query[option] = { $regex: q, $options: 'i' };
     }
 
-    const books = await Book.find(query);
+    const profiles = await Profile.find(query);
 
     return response.status(200).json({
-      count: books.length,
-      data: books,
+      count: profiles.length,
+      data: profiles,
     });
   } catch (error) {
     console.log(error.message);
@@ -74,21 +74,21 @@ router.get('/', async (request, response) => {
 });
 
 
-// Route for Get One Book from database by id
+// Route for Get One Profile from database by id
 router.get('/:id', async (request, response) => {
   try {
     const { id } = request.params;
 
-    const book = await Book.findById(id);
+    const profile = await Profile.findById(id);
 
-    return response.status(200).json(book);
+    return response.status(200).json(profile);
   } catch (error) {
     console.log(error.message);
     response.status(500).send({ message: error.message });
   }
 });
 
-// Route for Update a Book
+// Route for Update a Profile
 router.put('/:id', async (request, response) => {
   try {
     if (
@@ -103,13 +103,13 @@ router.put('/:id', async (request, response) => {
 
     const { id } = request.params;
 
-    const result = await Book.findByIdAndUpdate(id, request.body);
+    const result = await Profile.findByIdAndUpdate(id, request.body);
 
     if (!result) {
-      return response.status(404).json({ message: 'Book not found' });
+      return response.status(404).json({ message: 'Profile not found' });
     }
 
-    return response.status(200).send({ message: 'Book updated successfully' });
+    return response.status(200).send({ message: 'Profile updated successfully' });
   } catch (error) {
     console.log(error.message);
     response.status(500).send({ message: error.message });
@@ -126,19 +126,19 @@ console.log('commenter',commenter)
 console.log('text',text)
 
 
-    const book = await Book.findById(id);
+    const profile = await Profile.findById(id);
 
-    if (!book) {
-      return response.status(404).json({ message: 'Book not found' });
+    if (!profile) {
+      return response.status(404).json({ message: 'Profile not found' });
     }
 // Push the new rating object to the ratedUsers array
-// book.ratedUsers.push({ user, userRating });
-book.comments.push({ commenter, text,color });
+// profile.ratedUsers.push({ user, userRating });
+profile.comments.push({ commenter, text,color });
 
-// Save the updated book
-await book.save();
+// Save the updated profile
+await profile.save();
 
-    return response.status(200).send({ message: 'Book updated successfully' });
+    return response.status(200).send({ message: 'Profile updated successfully' });
   } catch (error) {
     console.log(error.message);
     response.status(500).send({ message: error.message });
@@ -150,26 +150,26 @@ router.put('/rating/:id', async (request, response) => {
     const { id } = request.params;
     const { user, userRating } = request.body;
 
-    const book = await Book.findById(id);
+    const profile = await Profile.findById(id);
 
-    if (!book) {
-      return response.status(404).json({ message: 'Book not found' });
+    if (!profile) {
+      return response.status(404).json({ message: 'Profile not found' });
     }
 
     // Push the new rating object to the ratedUsers array
-    book.ratedUsers.push({ user, userRating });
+    profile.ratedUsers.push({ user, userRating });
 
     // Calculate the new average rating
-    const totalRatings = book.ratedUsers.reduce((acc, curr) => acc + curr.userRating, 0);
-    const averageRating = totalRatings / book.ratedUsers.length;
+    const totalRatings = profile.ratedUsers.reduce((acc, curr) => acc + curr.userRating, 0);
+    const averageRating = totalRatings / profile.ratedUsers.length;
 
-    // Update the book's rating with the new average rating
-    book.rating = averageRating;
+    // Update the profile's rating with the new average rating
+    profile.rating = averageRating;
 
-    // Save the updated book
-    await book.save();
+    // Save the updated profile
+    await profile.save();
 
-    return response.status(200).send({ message: 'Book updated successfully' });
+    return response.status(200).send({ message: 'Profile updated successfully' });
   } catch (error) {
     console.log(error.message);
     response.status(500).send({ message: error.message });
@@ -177,18 +177,18 @@ router.put('/rating/:id', async (request, response) => {
 });
 
 
-// Route for Delete a book
+// Route for Delete a profile
 router.delete('/:id', async (request, response) => {
   try {
     const { id } = request.params;
 
-    const result = await Book.findByIdAndDelete(id);
+    const result = await Profile.findByIdAndDelete(id);
 
     if (!result) {
-      return response.status(404).json({ message: 'Book not found' });
+      return response.status(404).json({ message: 'Profile not found' });
     }
 
-    return response.status(200).send({ message: 'Book deleted successfully' });
+    return response.status(200).send({ message: 'Profile deleted successfully' });
   } catch (error) {
     console.log(error.message);
     response.status(500).send({ message: error.message });

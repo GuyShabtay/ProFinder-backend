@@ -16,6 +16,6 @@ const userSchema = mongoose.Schema({
   color: {
     type: String,
   },
-  books: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }],
+  profiles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Profile' }],
 });
 export const User = mongoose.model('User', userSchema);
